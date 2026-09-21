@@ -1,0 +1,33 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: # Позволяет запускать сборку вручную кнопкой
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
+
+      - name: Настройка Java (JDK 17)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Выдача прав на запуск Gradle Wrapper
+        run: chmod +x gradlew
+
+      - name: Сборка Debug APK
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Сохранение APK как артефакта
+        uses: actions/upload-artifact@v4
+        with:
+          name: voronezh-fishing-apk
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 7
